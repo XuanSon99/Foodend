@@ -28,9 +28,10 @@ class UserController extends Controller
     {
         $validate = Validator::make($request->all(), [
             'name' => 'required|string',
-            'email' => 'required|string|email|unique:users',
+            'email' => 'string|email|unique:users',
+            'phone' => 'string|unique:users',
             'password' => 'required|string|confirmed',
-            'level' => 'required|in:admin,reader',
+            'level' => 'required|in:admin,customer',
         ]);
         if ($validate->fails()) {
             return response()->json(["status" => false, "error" => $validate->errors()], 400);
@@ -68,7 +69,7 @@ class UserController extends Controller
         $validate = Validator::make($request->all(), [
             'name' => 'string',
             'password' => 'string|confirmed',
-            'level' => 'required|in:admin,reader',
+            'level' => 'required|in:admin,customer',
         ]);
         if ($validate->fails()) {
             return response()->json(["status" => false, "error" => $validate->errors()], 400);

@@ -18,17 +18,15 @@ class BillController extends Controller
         $listBill = Bill::orderBy('created_at', 'DESC')->get();
         $data = [];
         foreach ($listBill as $bill) {
-            $reader = Bill::find($bill->id)->getReader->first();
-            $document = Bill::find($bill->id)->getDocument->first();
+            $cus = Bill::find($bill->id)->getCustomer->first();
+            $pro = Bill::find($bill->id)->getProduct->first();
             $list = new \stdClass();
             $list->id = $bill->id;
-            $list->reader = $reader;
-            $list->document = $document;
-            $list->lender = $bill->lender;
-            $list->amount = $bill->amount;
-            $list->borrow_time = $bill->borrow_time;
-            $list->return_time = $bill->return_time;
-            $list->status = $bill->status;
+            $list->customer = $cus;
+            $list->product = $pro;
+            $list->address = $bill->address;
+            $list->price = $bill->price;
+            $list->quantity = $bill->quantity;
             array_push($data, $list);
         }
         return $data;
@@ -43,12 +41,12 @@ class BillController extends Controller
     public function store(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            'student_id' => 'required',
-            'document_id' => 'required',
-            'lender' => 'required|string',
-            'borrow_time' => 'required|date',
-            'return_time' => 'required|date',
-            'status' => 'required|in:ok,not'
+            'user_id' => 'required',
+            'product_id' => 'required',
+            'address' => 'required|string',
+            'price' => 'required',
+            'quantity' => 'required',
+            'status' => 'required|in:yes,no'
         ]);
         if ($validate->fails()) {
             return response()->json(["status" => false, "error" => $validate->errors()], 400);
@@ -78,12 +76,12 @@ class BillController extends Controller
     public function update(Request $request, Bill $bill)
     {
         $validate = Validator::make($request->all(), [
-            'student_id' => 'required',
-            'document_id' => 'required',
-            'lender' => 'required|string',
-            'borrow_time' => 'required|date',
-            'return_time' => 'required|date',
-            'status' => 'required|in:ok,not'
+            'user_id' => 'required',
+            'product_id' => 'required',
+            'address' => 'required|string',
+            'price' => 'required',
+            'quantity' => 'required',
+            'status' => 'required|in:yes,no'
         ]);
         if ($validate->fails()) {
             return response()->json(["status" => false, "error" => $validate->errors()], 400);

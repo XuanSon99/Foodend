@@ -14,9 +14,10 @@ class AuthController extends Controller
     {
         $validate = Validator::make($request->all(), [
             'name' => 'required|string',
-            'email' => 'required|string|email|unique:users',
+            'email' => 'string|email|unique:users',
+            'phone' => 'string|unique:users',
             'password' => 'required|string|confirmed',
-            'level' => 'required|in:admin,reader',
+            'level' => 'required|in:admin,customer',
         ]);
         if ($validate->fails()) {
             return response()->json(["status" => false, "error" => $validate->errors()], 400);
@@ -25,7 +26,9 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'level' => $request->level
+            'level' => $request->level,
+            'address' => $request->address,
+            'phone' => $request->phone,
         ]);
         $user->save();
         return response()->json([
@@ -35,14 +38,16 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            'email' => 'required|string|email',
             'password' => 'required|string',
             'remember_me' => 'boolean'
         ]);
         if ($validate->fails()) {
             return response()->json(["status" => false, "error" => $validate->errors()], 400);
         }
-        $credentials = request(['email', 'password']);
+        $credentials = request(['phone', 'password']);
+        if (is_null($request->phone)) {
+            $credentials = request(['email', 'password']);
+        }
         if (!Auth::attempt($credentials))
             return response()->json([
                 'status' => false,
@@ -54,7 +59,10 @@ class AuthController extends Controller
         if ($request->remember_me)
             $token->expires_at = Carbon::now()->addWeeks(1);
         $token->save();
-        $name = User::where("email", $request->email)->get();
+        $name = User::where("phone", $request->phone)->get();
+        if (!$request->phone) {
+            $name = User::where("email", $request->email)->get();
+        }
         return response()->json([
             'data' => $name,
             'access_token' => $tokenResult->accessToken,

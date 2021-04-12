@@ -5,17 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Bill extends Model
+class Comment extends Model
 {
     use HasFactory;
-    // protected $primaryKey = 'id';
     protected $fillable = [
-        'user_id',
+        'customer_id',
         'product_id',
-        'address',
-        'price',
-        'quantity',
-        'status'
+        'content',
     ];
     public function getCustomer()
     {
