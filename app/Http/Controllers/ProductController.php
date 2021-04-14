@@ -24,6 +24,15 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    public function search(Request $request)
+    {
+        $query = $request->get('query');
+        $list = Product::where('name', 'like', "%{$query}%")
+            ->orWhere('price', 'like', "%{$query}%")
+            ->orWhere('time', 'like', "%{$query}%")
+            ->get();
+        return response()->json(["status" => true, "data" =>  $list], 200);
+    }
     public function store(Request $request)
     {
         $validate = Validator::make($request->all(), [

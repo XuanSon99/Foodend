@@ -25,6 +25,7 @@ Route::group(['prefix' => 'auth'], function () {
 });
 
 // Route::group(['middleware' => 'auth:api'], function(){
+Route::post('search', 'App\Http\Controllers\ProductController@search');
 Route::resource('users', 'App\Http\Controllers\UserController');
 Route::resource('categories', 'App\Http\Controllers\CategoryController');
 Route::resource('products', 'App\Http\Controllers\ProductController');
