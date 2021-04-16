@@ -16,6 +16,11 @@ class BillController extends Controller
     public function index()
     {
         $listBill = Bill::orderBy('created_at', 'DESC')->get();
+        return $this->getList($listBill);
+    }
+
+    public function getList($listBill)
+    {
         $data = [];
         foreach ($listBill as $bill) {
             $cus = Bill::find($bill->id)->getCustomer->first();
@@ -27,6 +32,7 @@ class BillController extends Controller
             $list->address = $bill->address;
             $list->price = $bill->price;
             $list->quantity = $bill->quantity;
+            $list->status = $bill->status;
             array_push($data, $list);
         }
         return $data;
@@ -63,7 +69,8 @@ class BillController extends Controller
      */
     public function show(Bill $bill)
     {
-        return $bill;
+        $listBill = Bill::where("user_id", $bill->id)->get();
+        return $this->getList($listBill);
     }
 
     /**
