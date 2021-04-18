@@ -33,6 +33,8 @@ class BillController extends Controller
             $list->price = $bill->price;
             $list->quantity = $bill->quantity;
             $list->status = $bill->status;
+            $list->time = $bill->created_at;
+            $list->bill_id = $bill->bill_id;
             array_push($data, $list);
         }
         return $data;
@@ -69,8 +71,21 @@ class BillController extends Controller
      */
     public function show(Bill $bill)
     {
-        $listBill = Bill::where("user_id", $bill->id)->get();
-        return $this->getList($listBill);
+        return $bill;
+    }
+
+    public function getBill(Request $request)
+    {
+        $listBill = Bill::where("user_id", $request->user_id)->orderBy('created_at', 'DESC')->groupBy("bill_id")->select("bill_id")->get();
+        $data = [];
+        foreach ($listBill as $b) {
+            $bills = Bill::where("user_id", $request->user_id)->where("bill_id", $b->bill_id)->get();
+            $list = new \stdClass();
+            $list->products = $this->getList($bills);
+            $list->bill_id = $b->bill_id;
+            array_push($data, $list);
+        }
+        return $data;
     }
 
     /**

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
+use App\Models\Rating;
 use Illuminate\Http\Request;
 use Validator;
 
-class CommentController extends Controller
+class RatingController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,10 +15,15 @@ class CommentController extends Controller
      */
     public function index()
     {
-        // return Comment::orderBy('created_at', 'DESC')->get();
-        $listRate = Rating::orderBy('created_at', 'DESC')->get();
+        // return Rating::orderBy('created_at', 'DESC')->get();
+        $listCmt = Rating::orderBy('created_at', 'DESC')->get();
+        return $this->getList($listCmt);
+    }
+
+    public function getList($listCmt)
+    {
         $data = [];
-        foreach ($listRate as $item) {
+        foreach ($listCmt as $item) {
             $cus = Rating::find($item->id)->getCustomer->first();
             $pro = Rating::find($item->id)->getProduct->first();
             $list = new \stdClass();
@@ -40,58 +45,63 @@ class CommentController extends Controller
     public function store(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            'customer_id' => 'required',
+            'user_id' => 'required',
             'product_id' => 'required',
-            'start' => 'required|int',
+            'start' => 'required',
         ]);
         if ($validate->fails()) {
             return response()->json(["status" => false, "error" => $validate->errors()], 400);
         }
-        Comment::create($request->all());
+        Rating::create($request->all());
         return response()->json(["status" => true, "data" => $request->all()], 201);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Comment  $Comment
+     * @param  \App\Models\Rating  $Rating
      * @return \Illuminate\Http\Response
      */
-    public function show(Comment $Comment)
+    public function show(Rating $Rating)
     {
-        return $Comment;
+        return $Rating;
+    }
+    public function getRating(Request $request)
+    {
+        $list = Rating::where("product_id", $request->product_id)->orderBy('created_at', 'DESC')->get();
+        return $this->getList($list);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Comment  $Comment
+     * @param  \App\Models\Rating  $Rating
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Comment $Comment)
+    public function update(Request $request, Rating $Rating)
     {
         $validate = Validator::make($request->all(), [
-            'customer_id' => 'required',
+            'user_id' => 'required',
             'product_id' => 'required',
-            'start' => 'required|int',
+            'start' => 'required',
         ]);
         if ($validate->fails()) {
             return response()->json(["status" => false, "error" => $validate->errors()], 400);
         }
-        $Comment->update($request->all());
+        $Rating->update($request->all());
         return response()->json(["status" => true, "data" => $request->all()], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Comment  $Comment
+     * @param  \App\Models\Rating  $Rating
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Comment $Comment)
+    public function destroy(Rating $Rating)
     {
-        $Comment->delete();
+        $Rating->delete();
         return response()->json(["status" => true], 200);
     }
 }

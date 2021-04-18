@@ -9,13 +9,15 @@ class Bill extends Model
 {
     use HasFactory;
     // protected $primaryKey = 'id';
+    public $timestamps = true;
     protected $fillable = [
         'user_id',
         'product_id',
         'address',
         'price',
         'quantity',
-        'status'
+        'status',
+        'bill_id'
     ];
     public function getCustomer()
     {

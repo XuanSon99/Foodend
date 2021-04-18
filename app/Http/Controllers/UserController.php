@@ -66,14 +66,14 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $validate = Validator::make($request->all(), [
-            'name' => 'string',
-            'password' => 'string|confirmed',
-            'level' => 'required|in:admin,customer',
-        ]);
-        if ($validate->fails()) {
-            return response()->json(["status" => false, "error" => $validate->errors()], 400);
-        }
+        // $validate = Validator::make($request->all(), [
+        //     'name' => 'string',
+        //     'password' => 'string|confirmed',
+        //     'level' => 'required|in:admin,customer',
+        // ]);
+        // if ($validate->fails()) {
+        //     return response()->json(["status" => false, "error" => $validate->errors()], 400);
+        // }
         $user->update($request->all());
         return response()->json(["status" => true, "data" => $request->all()], 200);
     }

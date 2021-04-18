@@ -17,6 +17,11 @@ class CommentController extends Controller
     {
         // return Comment::orderBy('created_at', 'DESC')->get();
         $listCmt = Comment::orderBy('created_at', 'DESC')->get();
+        return $this->getList($listCmt);
+    }
+
+    public function getList($listCmt)
+    {
         $data = [];
         foreach ($listCmt as $item) {
             $cus = Comment::find($item->id)->getCustomer->first();
@@ -40,7 +45,7 @@ class CommentController extends Controller
     public function store(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            'customer_id' => 'required',
+            'user_id' => 'required',
             'product_id' => 'required',
             'content' => 'required',
         ]);
@@ -61,6 +66,11 @@ class CommentController extends Controller
     {
         return $Comment;
     }
+    public function getComment(Request $request)
+    {
+        $list = Comment::where("product_id", $request->product_id)->orderBy('created_at', 'DESC')->get();
+        return $this->getList($list);
+    }
 
     /**
      * Update the specified resource in storage.
@@ -72,7 +82,7 @@ class CommentController extends Controller
     public function update(Request $request, Comment $Comment)
     {
         $validate = Validator::make($request->all(), [
-            'customer_id' => 'required',
+            'user_id' => 'required',
             'product_id' => 'required',
             'content' => 'required',
         ]);
