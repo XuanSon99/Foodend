@@ -13,7 +13,6 @@ class AuthController extends Controller
     public function signup(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            'name' => 'required|string',
             'email' => 'string|email|unique:users',
             'phone' => 'string|unique:users',
             'password' => 'required|string|confirmed',
@@ -60,7 +59,7 @@ class AuthController extends Controller
             $token->expires_at = Carbon::now()->addWeeks(1);
         $token->save();
         $name = User::where("phone", $request->phone)->get();
-        if (!$request->phone) {
+        if (is_null($request->phone)) {
             $name = User::where("email", $request->email)->get();
         }
         return response()->json([

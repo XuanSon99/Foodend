@@ -15,4 +15,8 @@ class Product extends Model
         'time',
         'price'
     ];
+    public function getCate()
+    {
+        return $this->hasMany('App\Models\Category', 'id', 'cate_id');
+    }
 }

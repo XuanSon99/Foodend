@@ -15,8 +15,16 @@ class BillController extends Controller
      */
     public function index()
     {
-        $listBill = Bill::orderBy('created_at', 'DESC')->get();
-        return $this->getList($listBill);
+        $listBill = Bill::orderBy('created_at', 'DESC')->groupBy("bill_id")->select("bill_id")->get();
+        $data = [];
+        foreach ($listBill as $b) {
+            $bills = Bill::where("bill_id", $b->bill_id)->get();
+            $list = new \stdClass();
+            $list->products = $this->getList($bills);
+            $list->bill_id = $b->bill_id;
+            array_push($data, $list);
+        }
+        return $data;
     }
 
     public function getList($listBill)
@@ -54,7 +62,7 @@ class BillController extends Controller
             'address' => 'required|string',
             'price' => 'required',
             'quantity' => 'required',
-            'status' => 'required|in:yes,no'
+            'status' => 'required|in:delivered,wating,cancel,remove'
         ]);
         if ($validate->fails()) {
             return response()->json(["status" => false, "error" => $validate->errors()], 400);
@@ -98,17 +106,15 @@ class BillController extends Controller
     public function update(Request $request, Bill $bill)
     {
         $validate = Validator::make($request->all(), [
-            'user_id' => 'required',
-            'product_id' => 'required',
-            'address' => 'required|string',
-            'price' => 'required',
-            'quantity' => 'required',
             'status' => 'required|in:yes,no'
         ]);
         if ($validate->fails()) {
             return response()->json(["status" => false, "error" => $validate->errors()], 400);
         }
-        $bill->update($request->all());
+        $bills = Bill::where("bill_id", $bill->bill_id)->get();
+        foreach ($bills as $b) {
+            $b->update($request->all());
+        }
         return response()->json(["status" => true, "data" => $request->all()], 200);
     }
 
@@ -120,7 +126,10 @@ class BillController extends Controller
      */
     public function destroy(Bill $bill)
     {
-        $bill->delete();
+        $bills = Bill::where("bill_id", $bill->bill_id)->get();
+        foreach ($bills as $b) {
+            $b->delete();
+        }
         return response()->json(["status" => true], 200);
     }
 }

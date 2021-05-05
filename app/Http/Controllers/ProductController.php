@@ -15,7 +15,21 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return Product::orderBy('created_at', 'DESC')->get();
+        $proList = Product::orderBy('created_at', 'DESC')->get();
+        $data = [];
+        foreach ($proList as $pro) {
+            $cate = Product::find($pro->id)->getCate()->first();
+            $list = new \stdClass();
+            $list->id = $pro->id;
+            $list->category = $cate;
+            $list->price = $pro->price;
+            $list->name = $pro->name;
+            $list->time = $pro->time;
+            $list->image = $pro->image;
+            $list->cate_id = $pro->cate_id;
+            array_push($data, $list);
+        }
+        return $data;
     }
 
     /**
